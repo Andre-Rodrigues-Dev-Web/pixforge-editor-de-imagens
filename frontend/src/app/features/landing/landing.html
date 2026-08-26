@@ -1,0 +1,33 @@
+<header class="public-header">
+  <pf-logo />
+  <nav [class.open]="menuOpen()" aria-label="Navegação principal">
+    <a href="#ferramentas" (click)="menuOpen.set(false)">Ferramentas</a><a href="#privacidade" (click)="menuOpen.set(false)">Privacidade</a><a routerLink="/photo-editor">Editor</a>
+    <button class="theme-button" type="button" (click)="theme.cycle()" [attr.aria-label]="'Tema: ' + theme.mode()"><lucide-icon [img]="icons.Moon" [size]="18" /></button>
+    <a class="pf-button small" routerLink="/dashboard">Começar agora</a>
+  </nav>
+  <button class="menu" type="button" (click)="menuOpen.set(!menuOpen())" aria-label="Abrir menu"><lucide-icon [img]="menuOpen() ? icons.X : icons.Menu" /></button>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="pixel-field" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="hero-copy">
+      <span class="hero-badge"><lucide-icon [img]="icons.Sparkles" [size]="15" /> Sua oficina digital de imagens</span>
+      <h1>Suas imagens.<br><em>Forjadas</em> para impressionar.</h1>
+      <p>Converta, otimize, edite e prepare imagens para qualquer plataforma com controle profissional e uma experiência simples.</p>
+      <div class="hero-actions"><a class="pf-button" routerLink="/dashboard">Começar agora <lucide-icon [img]="icons.ArrowRight" [size]="19" /></a><a class="pf-button ghost" href="#ferramentas">Explorar ferramentas</a></div>
+      <div class="trust-row"><span><lucide-icon [img]="icons.Check" [size]="16" /> Sem cadastro</span><span><lucide-icon [img]="icons.Check" [size]="16" /> Privacidade primeiro</span><span><lucide-icon [img]="icons.Check" [size]="16" /> Lotes de até 30</span></div>
+    </div>
+    <div class="hero-tool"><div class="tool-top"><span class="forge-mark">PF</span><div><strong>Forje sua primeira imagem</strong><small>Rápido, seguro e sem complicação</small></div><span class="live">PRONTO</span></div><pf-upload-zone (filesSelected)="start($event)" /></div>
+  </section>
+
+  <section class="proof"><article><lucide-icon [img]="icons.Zap" /><div><strong>Processamento otimizado</strong><span>Fila inteligente para preservar desempenho</span></div></article><article id="privacidade"><lucide-icon [img]="icons.ShieldCheck" /><div><strong>Privacidade por design</strong><span>Arquivos nunca ficam armazenados permanentemente</span></div></article><article><lucide-icon [img]="icons.Sparkles" /><div><strong>Qualidade profissional</strong><span>Controle de formato, dimensão e exportação</span></div></article></section>
+
+  <section class="tools-section" id="ferramentas"><div class="section-heading"><div><p class="eyebrow">Arsenal PixForge</p><h2 class="section-title">Uma ferramenta para cada transformação.</h2></div><p>Do arquivo bruto ao conteúdo pronto para publicar — sem interfaces complicadas.</p></div>
+    <div class="tool-grid">@for (tool of tools; track tool.id) {<a class="tool-card" [routerLink]="tool.route"><span class="tool-icon"><lucide-icon [img]="toolIcon(tool.id)" /></span><span class="category">{{ tool.category === 'transform' ? 'Transformar' : tool.category === 'create' ? 'Criar' : 'Editar' }}</span><h3>{{ tool.name }}</h3><p>{{ tool.description }}</p><small>{{ tool.formats }}</small><span class="open">Abrir ferramenta <lucide-icon [img]="icons.ArrowRight" [size]="16" /></span></a>}</div>
+  </section>
+
+  <section class="cta"><div><p class="eyebrow">Acenda a forja</p><h2>Pronto para transformar suas imagens?</h2><p>Ferramentas poderosas, rápidas e diretas ao ponto.</p></div><a class="pf-button" routerLink="/dashboard">Abrir PixForge <lucide-icon [img]="icons.ArrowRight" [size]="18" /></a></section>
+</main>
+
+<footer><div><pf-logo /><p>Forje imagens perfeitas para qualquer plataforma.</p></div><div><strong>Ferramentas</strong><a routerLink="/converter">Conversor</a><a routerLink="/optimizer">Otimizador</a><a routerLink="/photo-editor">Editor</a></div><div><strong>Produto</strong><a href="#privacidade">Privacidade</a><a href="#ferramentas">Recursos</a></div><small>© 2026 PixForge. Feito para criadores.</small></footer>

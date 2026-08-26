@@ -1,0 +1,11 @@
+<header class="app-header"><button class="mobile-menu" (click)="mobileOpen.set(true)" aria-label="Abrir ferramentas"><lucide-icon [img]="icons.Menu" /></button><pf-logo [compact]="true" /><div class="header-search"><lucide-icon [img]="icons.Search" [size]="17" /><span>O que você quer fazer?</span><kbd>⌘ K</kbd></div><span class="privacy"><i></i> Processamento privado</span><button class="icon-button" (click)="theme.cycle()" [title]="'Tema: ' + theme.mode()"><lucide-icon [img]="icons.Moon" [size]="19" /></button></header>
+<div class="app-layout" [class.collapsed]="collapsed()">
+  @if (mobileOpen()) { <button class="backdrop" (click)="mobileOpen.set(false)" aria-label="Fechar menu"></button> }
+  <aside [class.mobile-open]="mobileOpen()"><div class="mobile-title"><strong>Ferramentas</strong><button (click)="mobileOpen.set(false)" aria-label="Fechar"><lucide-icon [img]="icons.X" /></button></div>
+    <nav aria-label="Ferramentas PixForge"><a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="mobileOpen.set(false)"><lucide-icon [img]="icons.Home" /><span>Visão geral</span></a><p>Transformar</p>
+      @for (tool of tools; track tool.id) {@if (tool.category === 'transform') {<a [routerLink]="tool.route" routerLinkActive="active" (click)="mobileOpen.set(false)"><span class="nav-symbol">{{ tool.shortName.charAt(0) }}</span><span>{{ tool.shortName }}</span></a>}}
+      <p>Criar & editar</p>@for (tool of tools; track tool.id) {@if (tool.category !== 'transform') {<a [routerLink]="tool.route" routerLinkActive="active" (click)="mobileOpen.set(false)"><span class="nav-symbol">{{ tool.shortName.charAt(0) }}</span><span>{{ tool.shortName }}</span></a>}}
+    </nav><div class="side-tip"><strong>Privacidade em primeiro lugar</strong><span>Seus arquivos são apagados após o processamento.</span></div><button class="collapse" (click)="collapsed.set(!collapsed())"><lucide-icon [img]="collapsed() ? icons.ChevronRight : icons.ChevronLeft" /><span>Recolher menu</span></button>
+  </aside>
+  <main class="workspace"><router-outlet /></main>
+</div><pf-toast-stack />

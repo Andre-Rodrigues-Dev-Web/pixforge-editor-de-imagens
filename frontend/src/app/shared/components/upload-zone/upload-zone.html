@@ -1,0 +1,8 @@
+<div class="upload" [class.dragging]="dragging()" [class.compact]="compact()" role="button" tabindex="0"
+  (keydown)="onKey($event, picker)" (click)="picker.click()" (dragover)="$event.preventDefault(); dragging.set(true)" (dragleave)="dragging.set(false)" (drop)="onDrop($event)">
+  <input #picker class="sr-only" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif,.heic,.heif" [multiple]="multiple()" (change)="onFiles(picker.files); picker.value = ''">
+  <span class="upload-icon"><lucide-icon [img]="icons.UploadCloud" [size]="28" /></span>
+  <div><strong>Arraste suas imagens aqui</strong><p>ou clique para selecionar do dispositivo</p></div>
+  <span class="formats">JPG · PNG · WEBP · HEIC · HEIF</span>
+  <span class="paste"><lucide-icon [img]="icons.ClipboardPaste" [size]="14" /> Você também pode colar uma imagem</span>
+</div>
