@@ -6,7 +6,7 @@ export interface ProcessOptions { format?: string; quality?: number; width?: num
 export interface BinaryResult { blob: Blob; filename: string; width: number; height: number; originalBytes: number; }
 @Injectable({ providedIn: 'root' })
 export class ImageApiService {
-  private readonly http = inject(HttpClient); private readonly api = 'http://localhost:3000/api/v1';
+  private readonly http = inject(HttpClient); private readonly api = '/api/v1';
   async process(file: File, kind: ProcessKind, options: ProcessOptions = {}): Promise<BinaryResult> {
     const body = new FormData(); body.append('file', file, file.name); let params = new HttpParams();
     for (const [key, value] of Object.entries(options)) if (value !== undefined) params = params.set(key, String(value));

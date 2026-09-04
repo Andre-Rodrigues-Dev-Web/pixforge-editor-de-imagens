@@ -1,0 +1,174 @@
+<header class="tool-head">
+  <div>
+    <p class="eyebrow">Fluxo de evento</p>
+    <h1>Da câmera para o jornal, em um único lote.</h1>
+    <p>Selecione, organize, identifique, aplique a marca e gere todos os formatos de publicação.</p>
+  </div>
+  <div class="privacy-card">
+    <lucide-icon [img]="icons.ShieldCheck" [size]="22" />
+    <span><strong>Processamento local</strong><small>Fotos sem envio para serviços externos</small></span>
+  </div>
+</header>
+
+@if (!files().length) {
+  <section class="onboarding">
+    <div class="intro-card">
+      <span class="feature-icon"><lucide-icon [img]="icons.Sparkles" [size]="28" /></span>
+      <p class="eyebrow">Projeto editorial</p>
+      <h2>Prepare o evento uma vez. Publique em todos os canais.</h2>
+      <ol>
+        <li><span>1</span><div><strong>Identifique o evento</strong><small>Nome, data, cidade e fotógrafo.</small></div></li>
+        <li><span>2</span><div><strong>Selecione as fotos</strong><small>Até 200 imagens, adicionadas em lotes.</small></div></li>
+        <li><span>3</span><div><strong>Gere o pacote</strong><small>Site, capa, redes sociais e manifestos.</small></div></li>
+      </ol>
+    </div>
+    <div class="start-panel">
+      <div class="event-fields compact-fields">
+        <label>Nome do evento<input type="text" placeholder="Ex.: Festival de Inverno 2026" [value]="eventName()" (input)="setEventField('name', $any($event.target).value)" /></label>
+        <label>Data<input type="date" [value]="eventDate()" (input)="setEventField('date', $any($event.target).value)" /></label>
+        <label>Cidade<input type="text" placeholder="Cidade do evento" [value]="eventCity()" (input)="setEventField('city', $any($event.target).value)" /></label>
+        <label>Fotógrafo padrão<input type="text" placeholder="Nome para os créditos" [value]="photographer()" (input)="setEventField('photographer', $any($event.target).value)" /></label>
+      </div>
+      <pf-upload-zone [maxFiles]="200" (filesSelected)="addFiles($event)" />
+    </div>
+  </section>
+  <section class="brand-proof" aria-label="Marcas disponíveis">
+    <article><img src="/assets/brands/sou-mais-bambui.png" alt="Jornal Sou Mais Bambuí" /><span><strong>Sou Mais Bambuí</strong><small>Preset editorial completo</small></span></article>
+    <article class="minas-proof"><img src="/assets/brands/sou-mais-minas-gerais-primary.png" alt="Sou Mais Minas Gerais" /><span><strong>Sou Mais Minas Gerais</strong><small>Preset editorial completo</small></span></article>
+    <article class="na-balada-proof"><img src="/assets/brands/na-balada-mg.png" alt="Na BaladaMG" /><span><strong>Na BaladaMG</strong><small>Logo + chamada do Instagram</small></span></article>
+    <article><lucide-icon [img]="icons.FileArchive" [size]="25" /><span><strong>Pacote para publicação</strong><small>Imagens + CSV + JSON para CMS</small></span></article>
+  </section>
+} @else {
+  <section class="status-strip" aria-label="Resumo do evento">
+    <span><strong>{{ eventName() || 'Evento sem nome' }}</strong></span><i aria-hidden="true"></i>
+    <span><strong>{{ includedFiles().length }}</strong> de {{ files().length }} selecionadas</span><i aria-hidden="true"></i>
+    <span><strong>{{ favoriteCount() }}</strong> favoritas</span><i aria-hidden="true"></i>
+    <span><strong>{{ activeBrand().shortName }}</strong></span>
+    @if (processedCount()) {
+      <span class="ready"><lucide-icon [img]="icons.CircleCheck" [size]="17" /> {{ processedCount() }} prontas · galeria {{ gallerySavings() }}% menor</span>
+    }
+  </section>
+
+  <div class="editor-layout">
+    <aside class="queue-panel" aria-label="Triagem de fotos">
+      <div class="panel-heading">
+        <div><p class="eyebrow">Triagem</p><h2>Fotos do evento</h2></div>
+        <button type="button" class="icon-button" (click)="clear()" aria-label="Remover todas as fotos" title="Limpar lote"><lucide-icon [img]="icons.Trash2" [size]="17" /></button>
+      </div>
+      <p class="queue-help">Marque favoritas para capas e redes. Fotos selecionadas entram na galeria.</p>
+      <div class="file-queue">
+        @for (item of files(); track item.id; let index = $index; let first = $first; let last = $last) {
+          <article class="file-row" [class.selected]="current()?.id === item.id" [class.excluded]="!item.included" [class.done]="item.status === 'done'">
+            <button type="button" class="file-select" (click)="select(item.id)" [attr.aria-label]="'Editar ' + item.file.name">
+              <span class="thumb"><img [src]="item.sourceUrl" alt="" /></span>
+              <span class="file-copy"><strong>{{ index + 1 }}. {{ item.file.name }}</strong><small>{{ formatBytes(item.file.size) }} · {{ item.width }} × {{ item.height }}</small></span>
+            </button>
+            <div class="row-actions">
+              <button type="button" class="row-action" [class.active]="item.favorite" (click)="toggleFavorite(item.id)" [attr.aria-label]="item.favorite ? 'Remover dos favoritos' : 'Marcar como favorita'" [title]="item.favorite ? 'Favorita' : 'Marcar favorita'"><lucide-icon [img]="icons.Star" [size]="14" /></button>
+              <button type="button" class="row-action" (click)="move(item.id, -1)" [disabled]="first" aria-label="Mover foto para cima"><lucide-icon [img]="icons.ArrowUp" [size]="14" /></button>
+              <button type="button" class="row-action" (click)="move(item.id, 1)" [disabled]="last" aria-label="Mover foto para baixo"><lucide-icon [img]="icons.ArrowDown" [size]="14" /></button>
+              <button type="button" class="row-action" [class.success]="item.included" (click)="toggleIncluded(item.id)" [attr.aria-label]="item.included ? 'Excluir da publicação' : 'Incluir na publicação'" [title]="item.included ? 'Incluída' : 'Excluída'"><lucide-icon [img]="item.included ? icons.Check : icons.X" [size]="14" /></button>
+              @if (primaryArtifact(item); as output) {
+                <button type="button" class="row-action success" (click)="downloadArtifact(item)" aria-label="Baixar saída principal"><lucide-icon [img]="icons.Download" [size]="14" /></button>
+              }
+            </div>
+            @if (item.status === 'processing') { <lucide-icon class="spin row-status" [img]="icons.LoaderCircle" [size]="16" /> }
+            @if (item.warnings.length) { <small class="row-warning"><lucide-icon [img]="icons.TriangleAlert" [size]="13" /> {{ item.warnings.join(' · ') }}</small> }
+            @if (item.error) { <small class="row-error">{{ item.error }}</small> }
+          </article>
+        }
+      </div>
+      <pf-upload-zone [compact]="true" [maxFiles]="200" (filesSelected)="addFiles($event)" />
+    </aside>
+
+    <section class="preview-panel">
+      <div class="preview-head">
+        <div><p class="eyebrow">Prévia</p><strong>{{ current()?.file?.name }}</strong></div>
+        <select aria-label="Formato exibido na prévia" [value]="previewOutput()" (change)="choosePreviewOutput($any($event.target).value)">
+          @for (output of outputPresets; track output.id) {
+            <option [value]="output.id" [disabled]="!isOutputSelected(output.id)">{{ output.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="canvas-stage"><canvas #previewCanvas aria-label="Prévia da foto com ajustes, marca e corte selecionados"></canvas></div>
+      <div class="preview-foot"><span><lucide-icon [img]="icons.Check" [size]="15" /> Ponto focal e identidade aplicados</span><span>EXIF/GPS removidos · crédito no manifesto</span></div>
+    </section>
+
+    <aside class="settings-panel">
+      <div class="panel-heading"><div><p class="eyebrow">Configuração</p><h2>Projeto editorial</h2></div><lucide-icon [img]="icons.Sparkles" [size]="20" /></div>
+
+      <fieldset>
+        <legend>Evento</legend>
+        <div class="event-fields">
+          <label>Nome<input type="text" placeholder="Nome do evento" [value]="eventName()" (input)="setEventField('name', $any($event.target).value)" /></label>
+          <label>Data<input type="date" [value]="eventDate()" (input)="setEventField('date', $any($event.target).value)" /></label>
+          <label>Cidade<input type="text" placeholder="Cidade" [value]="eventCity()" (input)="setEventField('city', $any($event.target).value)" /></label>
+          <label>Fotógrafo<input type="text" placeholder="Crédito padrão" [value]="photographer()" (input)="setEventField('photographer', $any($event.target).value)" /></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="brand-fieldset">
+        <legend>Veículo</legend>
+        <div class="brand-switch" role="radiogroup" aria-label="Escolha a marca">
+          <button type="button" role="radio" [attr.aria-checked]="brand() === 'bambui'" [class.active]="brand() === 'bambui'" (click)="chooseBrand('bambui')">Bambuí</button>
+          <button type="button" role="radio" [attr.aria-checked]="brand() === 'minas'" [class.active]="brand() === 'minas'" (click)="chooseBrand('minas')">Minas Gerais</button>
+          <button type="button" role="radio" [attr.aria-checked]="brand() === 'na-balada-mg'" [class.active]="brand() === 'na-balada-mg'" (click)="chooseBrand('na-balada-mg')">Na BaladaMG</button>
+        </div>
+        <div class="selected-brand" [style.--brand-accent]="activeBrand().accent"><span class="brand-logo"><img [src]="activeBrand().logo" [alt]="activeBrand().name" /></span><span><strong>{{ activeBrand().name }}</strong><small>{{ activeBrand().footerText }}</small></span></div>
+      </fieldset>
+
+      @if (current(); as photo) {
+        <fieldset>
+          <legend>Foto selecionada</legend>
+          <div class="photo-actions"><button type="button" (click)="rotateCurrent(-90)"><lucide-icon [img]="icons.RotateCcw" [size]="16" /> Girar à esquerda</button><button type="button" (click)="rotateCurrent(90)"><lucide-icon [img]="icons.RotateCw" [size]="16" /> Girar à direita</button></div>
+          @if (photo.warnings.length) { <div class="quality-warning"><lucide-icon [img]="icons.TriangleAlert" [size]="17" /><span><strong>Revisão recomendada</strong><small>{{ photo.warnings.join(' · ') }}</small></span></div> }
+          <label class="range-control"><span>Brilho <strong>{{ photo.brightness }}%</strong></span><input type="range" min="60" max="140" [value]="photo.brightness" (input)="adjustCurrent('brightness', $any($event.target).value)" /></label>
+          <label class="range-control"><span>Contraste <strong>{{ photo.contrast }}%</strong></span><input type="range" min="60" max="140" [value]="photo.contrast" (input)="adjustCurrent('contrast', $any($event.target).value)" /></label>
+          <label class="range-control"><span>Ponto focal horizontal <strong>{{ photo.focalX }}%</strong></span><input type="range" min="0" max="100" [value]="photo.focalX" (input)="adjustCurrent('focalX', $any($event.target).value)" /></label>
+          <label class="range-control"><span>Ponto focal vertical <strong>{{ photo.focalY }}%</strong></span><input type="range" min="0" max="100" [value]="photo.focalY" (input)="adjustCurrent('focalY', $any($event.target).value)" /></label>
+          <div class="editorial-fields">
+            <label>Legenda<textarea rows="2" placeholder="O que acontece na foto" [value]="photo.caption" (input)="updateCurrent('caption', $any($event.target).value)"></textarea></label>
+            <label>Crédito<input type="text" placeholder="Fotógrafo ou agência" [value]="photo.credit" (input)="updateCurrent('credit', $any($event.target).value)" /></label>
+            <label>Texto alternativo<textarea rows="2" placeholder="Descrição objetiva para acessibilidade" [value]="photo.altText" (input)="updateCurrent('altText', $any($event.target).value)"></textarea></label>
+          </div>
+        </fieldset>
+      }
+
+      <fieldset>
+        <legend>Identidade aplicada</legend>
+        <button type="button" class="switch-row" role="switch" [attr.aria-checked]="includeLogo()" (click)="toggleLogo()"><span><strong>Adicionar logo</strong><small>{{ activeBrand().logoPlacement === 'bottom-center' ? 'Centralizada na base' : 'Canto superior direito' }}</small></span><i [class.on]="includeLogo()"><b></b></i></button>
+        <button type="button" class="switch-row" role="switch" [attr.aria-checked]="includeText()" (click)="toggleText()"><span><strong>{{ activeBrand().footerControlLabel }}</strong><small>{{ activeBrand().footerText }}</small></span><i [class.on]="includeText()"><b></b></i></button>
+        <label class="range-control"><span>Opacidade da logo <strong>{{ logoOpacity() }}%</strong></span><input type="range" min="30" max="100" [value]="logoOpacity()" (input)="setLogoOpacity($any($event.target).value)" /></label>
+        <label class="range-control"><span>Tamanho da logo <strong>{{ logoScale() }}%</strong></span><input type="range" min="60" max="150" [value]="logoScale()" (input)="setLogoScale($any($event.target).value)" /></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Saídas do pacote</legend>
+        <div class="output-list">
+          @for (output of outputPresets; track output.id) {
+            <label [class.active]="isOutputSelected(output.id)"><input type="checkbox" [checked]="isOutputSelected(output.id)" (change)="toggleOutput(output.id)" /><span><strong>{{ output.name }}</strong><small>{{ output.description }}</small></span></label>
+          }
+        </div>
+        <p class="output-help">Galeria e miniaturas usam todas as fotos selecionadas. Capa e redes usam as favoritas — ou a primeira foto, se nenhuma estiver marcada. As preferências ficam salvas por veículo neste dispositivo.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Otimização</legend>
+        <div class="format-switch" role="radiogroup" aria-label="Formato de saída"><button type="button" [class.active]="format() === 'image/webp'" (click)="setFormat('image/webp')"><strong>WebP</strong><small>Mais leve</small></button><button type="button" [class.active]="format() === 'image/jpeg'" (click)="setFormat('image/jpeg')"><strong>JPEG</strong><small>Compatível</small></button></div>
+        <label class="range-control"><span>Qualidade <strong>{{ quality() }}%</strong></span><input type="range" min="45" max="95" step="1" [value]="quality()" (input)="setQuality($any($event.target).value)" /></label>
+        <label class="select-control"><span>Largura da galeria</span><select [value]="maxWidth()" (change)="setMaxWidth($any($event.target).value)"><option value="1200">1200 px · páginas rápidas</option><option value="1600">1600 px · equilíbrio</option><option value="1920">1920 px · recomendado</option><option value="2560">2560 px · alta resolução</option></select></label>
+      </fieldset>
+
+      @if (processedCount()) {
+        <div class="saving-card"><span><lucide-icon [img]="icons.Zap" [size]="19" /></span><div><strong>Galeria {{ gallerySavings() }}% menor</strong><small>{{ formatBytes(totalOriginalBytes()) }} originais · {{ formatBytes(totalOutputBytes()) }} no pacote completo</small></div></div>
+      }
+      <button type="button" class="pf-button full" (click)="readyForDownload() ? downloadAll() : processAll()" [disabled]="processing() || !includedFiles().length || !selectedOutputs().length || (!includeLogo() && !includeText())">
+        <lucide-icon [img]="readyForDownload() ? icons.FileArchive : icons.Sparkles" [size]="18" />
+        @if (processing()) { Processando {{ processedCount() + 1 }} de {{ includedFiles().length }}… } @else if (readyForDownload()) { Baixar pacote editorial } @else { Gerar pacote para publicação }
+      </button>
+      @if (!selectedOutputs().length) { <p class="validation">Selecione ao menos uma saída.</p> }
+      @if (!includeLogo() && !includeText()) { <p class="validation">Ative o logo ou o texto inferior para continuar.</p> }
+      <p class="privacy-note"><lucide-icon [img]="icons.ShieldCheck" [size]="15" /> EXIF e localização GPS são removidos. Crédito e autoria ficam nos manifestos.</p>
+    </aside>
+  </div>
+}

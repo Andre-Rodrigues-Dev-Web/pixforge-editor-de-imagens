@@ -3,8 +3,8 @@
   @if (mobileOpen()) { <button class="backdrop" (click)="mobileOpen.set(false)" aria-label="Fechar menu"></button> }
   <aside [class.mobile-open]="mobileOpen()"><div class="mobile-title"><strong>Ferramentas</strong><button (click)="mobileOpen.set(false)" aria-label="Fechar"><lucide-icon [img]="icons.X" /></button></div>
     <nav aria-label="Ferramentas PixForge"><a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="mobileOpen.set(false)"><lucide-icon [img]="icons.Home" /><span>Visão geral</span></a><p>Transformar</p>
-      @for (tool of tools; track tool.id) {@if (tool.category === 'transform') {<a [routerLink]="tool.route" routerLinkActive="active" (click)="mobileOpen.set(false)"><span class="nav-symbol">{{ tool.shortName.charAt(0) }}</span><span>{{ tool.shortName }}</span></a>}}
-      <p>Criar & editar</p>@for (tool of tools; track tool.id) {@if (tool.category !== 'transform') {<a [routerLink]="tool.route" routerLinkActive="active" (click)="mobileOpen.set(false)"><span class="nav-symbol">{{ tool.shortName.charAt(0) }}</span><span>{{ tool.shortName }}</span></a>}}
+      @for (tool of tools; track tool.id) {@if (tool.category === 'transform') {<a [routerLink]="tool.route" routerLinkActive="active" (click)="mobileOpen.set(false)"><lucide-icon [img]="toolIcon(tool.id)" [size]="19" /><span>{{ tool.shortName }}</span></a>}}
+      <p>Criar & editar</p>@for (tool of tools; track tool.id) {@if (tool.category !== 'transform') {<a [routerLink]="tool.route" routerLinkActive="active" (click)="mobileOpen.set(false)"><lucide-icon [img]="toolIcon(tool.id)" [size]="19" /><span>{{ tool.shortName }}</span></a>}}
     </nav><div class="side-tip"><strong>Privacidade em primeiro lugar</strong><span>Seus arquivos são apagados após o processamento.</span></div><button class="collapse" (click)="collapsed.set(!collapsed())"><lucide-icon [img]="collapsed() ? icons.ChevronRight : icons.ChevronLeft" /><span>Recolher menu</span></button>
   </aside>
   <main class="workspace"><router-outlet /></main>

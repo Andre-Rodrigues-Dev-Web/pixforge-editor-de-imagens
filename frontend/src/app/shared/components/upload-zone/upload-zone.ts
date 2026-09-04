@@ -6,7 +6,7 @@ import { LucideIconComponent } from '../icon/icon';
   selector: 'pf-upload-zone', standalone: true, imports: [LucideIconComponent], templateUrl: './upload-zone.html', styleUrl: './upload-zone.scss', changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UploadZoneComponent {
-  readonly multiple = input(true); readonly compact = input(false); readonly filesSelected = output<File[]>(); readonly dragging = signal(false);
+  readonly multiple = input(true); readonly compact = input(false); readonly maxFiles = input(30); readonly filesSelected = output<File[]>(); readonly dragging = signal(false);
   readonly icons = { UploadCloud, ClipboardPaste };
   onFiles(list: FileList | null): void { if (!list) return; this.emit(Array.from(list)); }
   onDrop(event: DragEvent): void { event.preventDefault(); this.dragging.set(false); this.onFiles(event.dataTransfer?.files ?? null); }

@@ -1,42 +1,328 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, signal, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { LucideDownload as Download, LucideFlipHorizontal as FlipHorizontal, LucideFlipVertical as FlipVertical, LucideImagePlus as ImagePlus, LucideLayers as Layers, LucideRedo2 as Redo2, LucideRotateCcw as RotateCcw, LucideRotateCw as RotateCw, LucideType as Type, LucideUndo2 as Undo2, LucideZoomIn as ZoomIn } from '@lucide/angular';
+import {
+  LucideDownload as Download,
+  LucideFlipHorizontal as FlipHorizontal,
+  LucideFlipVertical as FlipVertical,
+  LucideImagePlus as ImagePlus,
+  LucideLayers as Layers,
+  LucideRedo2 as Redo2,
+  LucideRotateCcw as RotateCcw,
+  LucideRotateCw as RotateCw,
+  LucideType as Type,
+  LucideUndo2 as Undo2,
+  LucideZoomIn as ZoomIn,
+} from '@lucide/angular';
 import { UploadZoneComponent } from '../../shared/components/upload-zone/upload-zone';
 import { ToastService } from '../../core/services/toast.service';
 import { LucideIconComponent } from '../../shared/components/icon/icon';
 
 type StudioMode = 'editor' | 'thumbnail' | 'social';
-interface Snapshot { brightness: number; contrast: number; saturation: number; warmth: number; blur: number; rotation: number; flipX: boolean; flipY: boolean; preset: string; text: string; }
-const socialPresets = [{ name: 'Post quadrado', width: 1080, height: 1080, ratio: '1:1' }, { name: 'Feed vertical', width: 1080, height: 1350, ratio: '4:5' }, { name: 'Story / Reels', width: 1080, height: 1920, ratio: '9:16' }, { name: 'Post horizontal', width: 1200, height: 630, ratio: '1.91:1' }, { name: 'YouTube', width: 1280, height: 720, ratio: '16:9' }, { name: 'Header', width: 1500, height: 500, ratio: '3:1' }];
+interface Snapshot {
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  warmth: number;
+  blur: number;
+  rotation: number;
+  flipX: boolean;
+  flipY: boolean;
+  preset: string;
+  text: string;
+}
+const socialPresets = [
+  { name: 'Post quadrado', width: 1080, height: 1080, ratio: '1:1' },
+  { name: 'Feed vertical', width: 1080, height: 1350, ratio: '4:5' },
+  { name: 'Story / Reels', width: 1080, height: 1920, ratio: '9:16' },
+  { name: 'Post horizontal', width: 1200, height: 630, ratio: '1.91:1' },
+  { name: 'YouTube', width: 1280, height: 720, ratio: '16:9' },
+  { name: 'Header', width: 1500, height: 500, ratio: '3:1' },
+];
 
-@Component({ selector: 'pf-canvas-studio', standalone: true, imports: [ReactiveFormsModule, LucideIconComponent, UploadZoneComponent], templateUrl: './canvas-studio.html', styleUrl: './canvas-studio.scss', changeDetection: ChangeDetectionStrategy.OnPush })
+@Component({
+  selector: 'pf-canvas-studio',
+  standalone: true,
+  imports: [ReactiveFormsModule, LucideIconComponent, UploadZoneComponent],
+  templateUrl: './canvas-studio.html',
+  styleUrl: './canvas-studio.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
 export class CanvasStudioComponent implements AfterViewInit {
   @ViewChild('canvas') private canvasRef?: ElementRef<HTMLCanvasElement>;
-  private readonly route = inject(ActivatedRoute); private readonly fb = inject(FormBuilder); private readonly toast = inject(ToastService);
-  readonly mode = (this.route.snapshot.data['mode'] as StudioMode) ?? 'editor'; readonly imageLoaded = signal(false); readonly compare = signal(false); readonly zoom = signal(70);
-  readonly history = signal<Snapshot[]>([]); readonly historyIndex = signal(-1); readonly presets = socialPresets; readonly selectedSocial = signal(socialPresets[0]!);
-  readonly icons = { Download, FlipHorizontal, FlipVertical, ImagePlus, Layers, Redo2, RotateCcw, RotateCw, Type, Undo2, ZoomIn };
-  readonly titles = { editor: ['Editor de fotos', 'Sua visão. Seus ajustes.', 'Edite de forma não destrutiva e exporte quando estiver perfeito.'], thumbnail: ['Thumbnail YouTube', 'Pare o scroll.', 'Crie uma thumbnail de 1280 × 720 com imagem e texto em camadas.'], social: ['Social Crop', 'Um clique. Todos os formatos.', 'Enquadre sua imagem para feeds, stories, capas e headers.'] }[this.mode];
-  readonly form = this.fb.nonNullable.group({ brightness: [100], contrast: [100], saturation: [100], warmth: [0], blur: [0], rotation: [0], flipX: [false], flipY: [false], preset: ['Original'], text: ['SEU TÍTULO AQUI'], textSize: [88], textColor: ['#ffffff'], stroke: [true], quality: [90], format: ['image/webp'] });
+  private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
+  private readonly toast = inject(ToastService);
+  readonly mode = (this.route.snapshot.data['mode'] as StudioMode) ?? 'editor';
+  readonly imageLoaded = signal(false);
+  readonly compare = signal(false);
+  readonly zoom = signal(70);
+  readonly history = signal<Snapshot[]>([]);
+  readonly historyIndex = signal(-1);
+  readonly presets = socialPresets;
+  readonly selectedSocial = signal(socialPresets[0]!);
+  readonly icons = {
+    Download,
+    FlipHorizontal,
+    FlipVertical,
+    ImagePlus,
+    Layers,
+    Redo2,
+    RotateCcw,
+    RotateCw,
+    Type,
+    Undo2,
+    ZoomIn,
+  };
+  readonly titles = {
+    editor: [
+      'Editor de fotos',
+      'Sua visão. Seus ajustes.',
+      'Edite de forma não destrutiva e exporte quando estiver perfeito.',
+    ],
+    thumbnail: [
+      'Thumbnail YouTube',
+      'Pare o scroll.',
+      'Crie uma thumbnail de 1280 × 720 com imagem e texto em camadas.',
+    ],
+    social: [
+      'Social Crop',
+      'Um clique. Todos os formatos.',
+      'Enquadre sua imagem para feeds, stories, capas e headers.',
+    ],
+  }[this.mode];
+  readonly form = this.fb.nonNullable.group({
+    brightness: [100],
+    contrast: [100],
+    saturation: [100],
+    warmth: [0],
+    blur: [0],
+    rotation: [0],
+    flipX: [false],
+    flipY: [false],
+    preset: ['Original'],
+    text: ['SEU TÍTULO AQUI'],
+    textSize: [88],
+    textColor: ['#ffffff'],
+    stroke: [true],
+    quality: [90],
+    format: ['image/webp'],
+  });
   private source?: HTMLImageElement;
 
-  ngAfterViewInit(): void { this.form.valueChanges.subscribe(() => { if (this.imageLoaded()) this.draw(); }); }
-  load(files: File[]): void { const file = files[0]; if (!file) return; const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { this.source = image; this.setCanvasSize(); this.imageLoaded.set(true); this.reset(false); this.toast.show('Imagem pronta para editar.'); }; image.src = String(reader.result); }; reader.readAsDataURL(file); }
-  setPreset(name: string): void { const map: Record<string, Partial<Snapshot>> = { Vivid: { brightness: 104, contrast: 112, saturation: 126 }, Warm: { brightness: 103, contrast: 103, saturation: 110, warmth: 18 }, Cold: { contrast: 108, saturation: 90, warmth: -22 }, Cinema: { brightness: 92, contrast: 122, saturation: 82, warmth: 9 }, Vintage: { brightness: 105, contrast: 88, saturation: 72, warmth: 24 }, 'Black & White': { saturation: 0, contrast: 112 }, Matte: { brightness: 108, contrast: 82, saturation: 88 }, Original: { brightness: 100, contrast: 100, saturation: 100, warmth: 0 } }; this.form.patchValue({ ...map[name], preset: name }); this.commit(); }
-  chooseSocial(preset: typeof socialPresets[number]): void { this.selectedSocial.set(preset); this.setCanvasSize(); this.draw(); }
-  rotate(degrees: number): void { this.form.controls.rotation.setValue((this.form.controls.rotation.value + degrees) % 360); this.commit(); }
-  flip(axis: 'x' | 'y'): void { const control = axis === 'x' ? this.form.controls.flipX : this.form.controls.flipY; control.setValue(!control.value); this.commit(); }
-  commit(): void { const snapshot = this.snapshot(); const current = this.history().slice(0, this.historyIndex() + 1); this.history.set([...current, snapshot].slice(-40)); this.historyIndex.set(this.history().length - 1); }
-  undo(): void { if (this.historyIndex() <= 0) return; this.historyIndex.update((i) => i - 1); this.restore(this.history()[this.historyIndex()]!); }
-  redo(): void { if (this.historyIndex() >= this.history().length - 1) return; this.historyIndex.update((i) => i + 1); this.restore(this.history()[this.historyIndex()]!); }
-  reset(commit = true): void { this.form.patchValue({ brightness: 100, contrast: 100, saturation: 100, warmth: 0, blur: 0, rotation: 0, flipX: false, flipY: false, preset: 'Original' }); if (commit) this.commit(); else { this.history.set([this.snapshot()]); this.historyIndex.set(0); } }
-  export(): void { const canvas = this.canvasRef?.nativeElement; if (!canvas) return; const type = this.form.controls.format.value; canvas.toBlob((blob) => { if (!blob) return; const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `pixforge-${this.mode}.${type.split('/')[1]}`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); this.toast.show('Imagem exportada com sucesso.'); }, type, this.form.controls.quality.value / 100); }
-  @HostListener('window:keydown', ['$event']) shortcuts(event: KeyboardEvent): void { if (!(event.ctrlKey || event.metaKey)) return; if (event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? this.redo() : this.undo(); } if (event.key.toLowerCase() === 's') { event.preventDefault(); this.export(); } }
+  ngAfterViewInit(): void {
+    this.form.valueChanges.subscribe(() => {
+      if (this.imageLoaded()) this.draw();
+    });
+  }
+  load(files: File[]): void {
+    const file = files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        this.source = image;
+        this.imageLoaded.set(true);
+        setTimeout(() => {
+          this.setCanvasSize();
+          this.reset(false);
+          this.draw();
+          this.toast.show('Imagem pronta para editar.');
+        });
+      };
+      image.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+  setPreset(name: string): void {
+    const map: Record<string, Partial<Snapshot>> = {
+      Vivid: { brightness: 104, contrast: 112, saturation: 126 },
+      Warm: { brightness: 103, contrast: 103, saturation: 110, warmth: 18 },
+      Cold: { contrast: 108, saturation: 90, warmth: -22 },
+      Cinema: { brightness: 92, contrast: 122, saturation: 82, warmth: 9 },
+      Vintage: { brightness: 105, contrast: 88, saturation: 72, warmth: 24 },
+      'Black & White': { saturation: 0, contrast: 112 },
+      Matte: { brightness: 108, contrast: 82, saturation: 88 },
+      Original: { brightness: 100, contrast: 100, saturation: 100, warmth: 0 },
+    };
+    this.form.patchValue({ ...map[name], preset: name });
+    this.commit();
+  }
+  chooseSocial(preset: (typeof socialPresets)[number]): void {
+    this.selectedSocial.set(preset);
+    this.setCanvasSize();
+    this.draw();
+  }
+  rotate(degrees: number): void {
+    this.form.controls.rotation.setValue((this.form.controls.rotation.value + degrees) % 360);
+    this.commit();
+  }
+  flip(axis: 'x' | 'y'): void {
+    const control = axis === 'x' ? this.form.controls.flipX : this.form.controls.flipY;
+    control.setValue(!control.value);
+    this.commit();
+  }
+  commit(): void {
+    const snapshot = this.snapshot();
+    const current = this.history().slice(0, this.historyIndex() + 1);
+    this.history.set([...current, snapshot].slice(-40));
+    this.historyIndex.set(this.history().length - 1);
+  }
+  undo(): void {
+    if (this.historyIndex() <= 0) return;
+    this.historyIndex.update((i) => i - 1);
+    this.restore(this.history()[this.historyIndex()]!);
+  }
+  redo(): void {
+    if (this.historyIndex() >= this.history().length - 1) return;
+    this.historyIndex.update((i) => i + 1);
+    this.restore(this.history()[this.historyIndex()]!);
+  }
+  reset(commit = true): void {
+    this.form.patchValue({
+      brightness: 100,
+      contrast: 100,
+      saturation: 100,
+      warmth: 0,
+      blur: 0,
+      rotation: 0,
+      flipX: false,
+      flipY: false,
+      preset: 'Original',
+    });
+    if (commit) this.commit();
+    else {
+      this.history.set([this.snapshot()]);
+      this.historyIndex.set(0);
+    }
+  }
+  export(): void {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas) return;
+    const type = this.form.controls.format.value;
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) return;
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `pixforge-${this.mode}.${type.split('/')[1]}`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        this.toast.show('Imagem exportada com sucesso.');
+      },
+      type,
+      this.form.controls.quality.value / 100,
+    );
+  }
+  @HostListener('window:keydown', ['$event']) shortcuts(event: KeyboardEvent): void {
+    if (!(event.ctrlKey || event.metaKey)) return;
+    if (event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      event.shiftKey ? this.redo() : this.undo();
+    }
+    if (event.key.toLowerCase() === 's') {
+      event.preventDefault();
+      this.export();
+    }
+  }
 
-  private setCanvasSize(): void { const canvas = this.canvasRef?.nativeElement; if (!canvas || !this.source) return; if (this.mode === 'thumbnail') { canvas.width = 1280; canvas.height = 720; } else if (this.mode === 'social') { canvas.width = this.selectedSocial().width; canvas.height = this.selectedSocial().height; } else { const scale = Math.min(1, 2400 / Math.max(this.source.width, this.source.height)); canvas.width = Math.round(this.source.width * scale); canvas.height = Math.round(this.source.height * scale); } }
-  private draw(): void { const canvas = this.canvasRef?.nativeElement; const image = this.source; const context = canvas?.getContext('2d'); if (!canvas || !image || !context) return; const v = this.form.getRawValue(); context.save(); context.clearRect(0, 0, canvas.width, canvas.height); context.filter = this.compare() ? 'none' : `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturation}%) sepia(${Math.max(0, v.warmth)}%) hue-rotate(${Math.min(0, v.warmth)}deg) blur(${v.blur}px)`; context.translate(canvas.width / 2, canvas.height / 2); context.rotate(v.rotation * Math.PI / 180); context.scale(v.flipX ? -1 : 1, v.flipY ? -1 : 1); const imageRatio = image.width / image.height; const canvasRatio = canvas.width / canvas.height; let width: number; let height: number; if (imageRatio > canvasRatio) { height = canvas.height; width = height * imageRatio; } else { width = canvas.width; height = width / imageRatio; } context.drawImage(image, -width / 2, -height / 2, width, height); context.restore(); if (this.mode === 'thumbnail' && !this.compare()) this.drawText(context, canvas, v.text, v.textSize, v.textColor, v.stroke); }
-  private drawText(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, text: string, size: number, color: string, stroke: boolean): void { context.save(); context.font = `800 ${size}px Manrope, sans-serif`; context.textAlign = 'center'; context.textBaseline = 'middle'; const lines = text.toUpperCase().split('\n').slice(0, 3); lines.forEach((line, index) => { const y = canvas.height * .7 + index * size * 1.05; if (stroke) { context.lineWidth = Math.max(5, size * .1); context.strokeStyle = '#101d30'; context.strokeText(line, canvas.width / 2, y); } context.fillStyle = color; context.fillText(line, canvas.width / 2, y); }); context.restore(); }
-  private snapshot(): Snapshot { const v = this.form.getRawValue(); return { brightness: v.brightness, contrast: v.contrast, saturation: v.saturation, warmth: v.warmth, blur: v.blur, rotation: v.rotation, flipX: v.flipX, flipY: v.flipY, preset: v.preset, text: v.text }; }
-  private restore(value: Snapshot): void { this.form.patchValue(value); }
+  private setCanvasSize(): void {
+    const canvas = this.canvasRef?.nativeElement;
+    if (!canvas || !this.source) return;
+    if (this.mode === 'thumbnail') {
+      canvas.width = 1280;
+      canvas.height = 720;
+    } else if (this.mode === 'social') {
+      canvas.width = this.selectedSocial().width;
+      canvas.height = this.selectedSocial().height;
+    } else {
+      const scale = Math.min(1, 2400 / Math.max(this.source.width, this.source.height));
+      canvas.width = Math.round(this.source.width * scale);
+      canvas.height = Math.round(this.source.height * scale);
+    }
+  }
+  private draw(): void {
+    const canvas = this.canvasRef?.nativeElement;
+    const image = this.source;
+    const context = canvas?.getContext('2d');
+    if (!canvas || !image || !context) return;
+    const v = this.form.getRawValue();
+    context.save();
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.filter = this.compare()
+      ? 'none'
+      : `brightness(${v.brightness}%) contrast(${v.contrast}%) saturate(${v.saturation}%) sepia(${Math.max(0, v.warmth)}%) hue-rotate(${Math.min(0, v.warmth)}deg) blur(${v.blur}px)`;
+    context.translate(canvas.width / 2, canvas.height / 2);
+    context.rotate((v.rotation * Math.PI) / 180);
+    context.scale(v.flipX ? -1 : 1, v.flipY ? -1 : 1);
+    const imageRatio = image.width / image.height;
+    const canvasRatio = canvas.width / canvas.height;
+    let width: number;
+    let height: number;
+    if (imageRatio > canvasRatio) {
+      height = canvas.height;
+      width = height * imageRatio;
+    } else {
+      width = canvas.width;
+      height = width / imageRatio;
+    }
+    context.drawImage(image, -width / 2, -height / 2, width, height);
+    context.restore();
+    if (this.mode === 'thumbnail' && !this.compare())
+      this.drawText(context, canvas, v.text, v.textSize, v.textColor, v.stroke);
+  }
+  private drawText(
+    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    text: string,
+    size: number,
+    color: string,
+    stroke: boolean,
+  ): void {
+    context.save();
+    context.font = `800 ${size}px Manrope, sans-serif`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    const lines = text.toUpperCase().split('\n').slice(0, 3);
+    lines.forEach((line, index) => {
+      const y = canvas.height * 0.7 + index * size * 1.05;
+      if (stroke) {
+        context.lineWidth = Math.max(5, size * 0.1);
+        context.strokeStyle = '#101d30';
+        context.strokeText(line, canvas.width / 2, y);
+      }
+      context.fillStyle = color;
+      context.fillText(line, canvas.width / 2, y);
+    });
+    context.restore();
+  }
+  private snapshot(): Snapshot {
+    const v = this.form.getRawValue();
+    return {
+      brightness: v.brightness,
+      contrast: v.contrast,
+      saturation: v.saturation,
+      warmth: v.warmth,
+      blur: v.blur,
+      rotation: v.rotation,
+      flipX: v.flipX,
+      flipY: v.flipY,
+      preset: v.preset,
+      text: v.text,
+    };
+  }
+  private restore(value: Snapshot): void {
+    this.form.patchValue(value);
+  }
 }

@@ -13,6 +13,7 @@ Oficina digital para converter, otimizar, editar e preparar imagens para web e r
 - editor Canvas com filtros reais, comparação, undo/redo e exportação;
 - thumbnails 1280 × 720 com texto em camadas;
 - presets para redes sociais e áreas seguras de Story/Reels;
+- fluxo editorial de eventos com triagem, marcas por jornal, legendas, créditos, múltiplas saídas e manifestos para CMS;
 - pacote de favicon com ICO, PNGs, manifest e tags HTML;
 - tema claro/escuro/sistema, SSR/hydration e PWA.
 

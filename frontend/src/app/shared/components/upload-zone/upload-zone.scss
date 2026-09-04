@@ -1,1 +1,71 @@
-.upload{min-height:250px;padding:38px 24px;border:2px dashed #c9d4e2;border-radius:18px;background:linear-gradient(145deg,color-mix(in srgb,var(--background-secondary) 94%,var(--pixforge-blue)),var(--background-secondary));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;transition:.2s ease;cursor:pointer}.upload:hover,.upload.dragging{border-color:var(--pixforge-orange);background:color-mix(in srgb,var(--pixforge-orange) 5%,var(--background-secondary));transform:translateY(-2px)}.upload.compact{min-height:190px;padding:28px}.upload-icon{width:58px;height:58px;border-radius:16px;background:var(--pixforge-orange);color:#fff;display:grid;place-items:center;box-shadow:0 12px 28px rgb(254 115 3 / .25);margin-bottom:18px}.upload strong{display:block;font-size:1.12rem}.upload p{margin:6px 0 15px;color:var(--text-secondary);font-size:.9rem}.formats{padding:7px 12px;border-radius:999px;background:var(--surface-soft);color:var(--text-secondary);font-size:.7rem;font-weight:800;letter-spacing:.08em}.paste{margin-top:14px;color:var(--text-secondary);font-size:.75rem;display:flex;align-items:center;gap:6px}
+.upload {
+  min-height: 250px;
+  padding: 38px 24px;
+  border: 2px dashed #c9d4e2;
+  border-radius: 18px;
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--background-secondary) 94%, var(--pixforge-blue)),
+    var(--background-secondary)
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition: 0.2s ease;
+  cursor: pointer;
+}
+.upload:hover,
+.upload.dragging {
+  border-color: var(--pixforge-orange);
+  background: color-mix(in srgb, var(--pixforge-orange) 5%, var(--background-secondary));
+  transform: translateY(-2px);
+}
+.upload.compact {
+  min-height: 190px;
+  padding: 28px;
+}
+.upload-icon {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  background: var(--pixforge-orange);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 12px 28px rgb(254 115 3 / 0.25);
+  margin-bottom: 18px;
+}
+.upload strong {
+  display: block;
+  font-size: 1.12rem;
+}
+.upload p {
+  margin: 6px 0 15px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.formats {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.size-limit {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+.paste {
+  margin-top: 11px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

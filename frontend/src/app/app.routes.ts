@@ -18,6 +18,7 @@ export const routes: Routes = [
     { path: 'photo-editor', title: 'Editor de fotos | PixForge', ...studio('editor') },
     { path: 'youtube-thumbnail', title: 'Criar thumbnail para YouTube | PixForge', ...studio('thumbnail') },
     { path: 'social-crop', title: 'Redimensionar para redes sociais | PixForge', ...studio('social') },
+    { path: 'brand-gallery', title: 'Marca para galeria | PixForge', loadComponent: () => import('./features/brand-gallery/brand-gallery').then((m) => m.BrandGalleryComponent) },
   ] },
   { path: 'converter-heic', redirectTo: 'converter', pathMatch: 'full' },
   { path: 'otimizar-imagem', redirectTo: 'optimizer', pathMatch: 'full' },
@@ -26,5 +27,6 @@ export const routes: Routes = [
   { path: 'gerar-favicon', redirectTo: 'favicon-generator', pathMatch: 'full' },
   { path: 'editor-de-fotos', redirectTo: 'photo-editor', pathMatch: 'full' },
   { path: 'redimensionar-imagem-redes-sociais', redirectTo: 'social-crop', pathMatch: 'full' },
+  { path: 'marca-para-galeria', redirectTo: 'brand-gallery', pathMatch: 'full' },
   { path: '**', redirectTo: '' },
 ];

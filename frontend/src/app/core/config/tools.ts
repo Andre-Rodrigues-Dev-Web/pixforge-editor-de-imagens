@@ -11,4 +11,5 @@ export const PIXFORGE_TOOLS: readonly PixForgeTool[] = [
   { id: 'favicon', name: 'Gerador de favicon', shortName: 'Favicon', description: 'Crie todos os ícones do seu site.', route: '/favicon-generator', icon: 'app-window', category: 'create', formats: 'PNG · MANIFEST · ZIP' },
   { id: 'editor', name: 'Editor de fotos', shortName: 'Editor', description: 'Ajuste cores, luz, filtros e detalhes.', route: '/photo-editor', icon: 'sliders-horizontal', category: 'edit', formats: 'AJUSTES NÃO DESTRUTIVOS' },
   { id: 'social', name: 'Social Crop', shortName: 'Social Crop', description: 'Redimensione imagens para qualquer rede social.', route: '/social-crop', icon: 'crop', category: 'edit', formats: 'FEED · STORY · CAPAS' },
+  { id: 'brand-gallery', name: 'Fluxo de evento', shortName: 'Publicar Evento', description: 'Selecione, identifique e gere galerias, capas e formatos sociais em lote.', route: '/brand-gallery', icon: 'badge', category: 'create', formats: 'BAMBUÍ · MINAS GERAIS · NA BALADAMG' },
 ] as const;

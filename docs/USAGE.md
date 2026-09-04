@@ -47,6 +47,20 @@ Atalhos:
 
 Escolha um preset para post quadrado, feed vertical, Story/Reels, post horizontal, YouTube ou header. O PixForge redimensiona o canvas e mantém o enquadramento central. Stories exibem áreas seguras.
 
+## Publicar evento
+
+1. Informe nome, data, cidade e fotógrafo do evento.
+2. Adicione até 200 fotos, em uma ou mais seleções.
+3. Escolha o veículo: Sou Mais Bambuí, Sou Mais Minas Gerais ou Na BaladaMG.
+4. Faça a triagem, marque favoritas, ajuste a ordem e exclua fotos que não serão publicadas.
+5. Para cada foto, revise rotação, brilho, contraste, ponto focal, legenda, crédito e texto alternativo.
+6. Escolha as saídas: galeria, capa, Instagram Feed, Story/Reels e miniaturas.
+7. Gere e baixe o pacote editorial.
+
+Galeria e miniaturas são geradas para todas as fotos incluídas. Capa e formatos sociais usam as favoritas; quando nenhuma favorita é marcada, usam a primeira foto. O ZIP separa os arquivos por canal e inclui `manifesto.json`, `fotos.csv`, `wordpress-import.json` e um guia de leitura.
+
+As preferências de marca, qualidade e formatos ficam salvas por veículo no dispositivo. O conteúdo exportado não preserva EXIF nem localização GPS; crédito, legenda e autoria ficam registrados nos manifestos.
+
 ## Tema e privacidade
 
 O botão de lua alterna entre claro, escuro e sistema. A preferência fica apenas no dispositivo. Imagens não são gravadas permanentemente nem incluídas em logs.

@@ -25,6 +25,20 @@ describe('PixForge API', () => {
     await app.close();
   });
 
+  it('optimizes a real PNG to JPEG through the public optimizer route', async () => {
+    const app = await buildApp();
+    const image = await sharp({ create: { width: 48, height: 48, channels: 4, background: '#0167d3' } }).png().toBuffer();
+    const boundary = 'pixforge-optimizer-boundary';
+    const body = Buffer.concat([
+      Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="optimize.png"\r\nContent-Type: image/png\r\n\r\n`), image, Buffer.from(`\r\n--${boundary}--\r\n`),
+    ]);
+    const response = await app.inject({ method: 'POST', url: '/api/v1/images/optimize?format=jpeg&quality=60&removeMetadata=true', headers: { 'content-type': `multipart/form-data; boundary=${boundary}` }, payload: body });
+    expect(response.statusCode).toBe(200);
+    expect(response.headers['content-type']).toContain('image/jpeg');
+    expect(response.headers['content-disposition']).toContain('optimize-pixforge.jpg');
+    await app.close();
+  });
+
   it('creates a complete favicon ZIP', async () => {
     const app = await buildApp();
     const image = await sharp({ create: { width: 64, height: 64, channels: 4, background: '#101d30' } }).png().toBuffer();
